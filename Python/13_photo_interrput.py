@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#usr/bin/env python
 import RPi.GPIO as GPIO
 
 LightBreakPin = 11
@@ -13,14 +13,14 @@ def setup():
 def loop():
 	while True:
 		if GPIO.input(LightBreakPin) == GPIO.LOW:
-			print '...led on'
+			print 'LED off...'
 			GPIO.output(LedPin, GPIO.LOW)  # led on
 		else:
-			print 'led off...'
+			print 'Blocked...LED on!'
 			GPIO.output(LedPin, GPIO.HIGH) # led off
 
 def destroy():
-	GPIO.output(LedPin, GPIO.HIGH)     # led off
+	GPIO.output(LedPin, GPIO.LOW)     # led off
 	GPIO.cleanup()                     # Release resource
 
 if __name__ == '__main__':     # Program start from here
