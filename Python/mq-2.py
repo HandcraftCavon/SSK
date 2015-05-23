@@ -30,6 +30,11 @@ def loop():
 		print tmp							# Print analog value
 		print smokeVal						# Print digital value
 		if smokeVal == 0:					# Beep when smokeval is 0
+			print '    ****************'
+			print '    * !! DANGER !! *'
+			print '    ****************'
+			print ''
+				
 			GPIO.output(BEEP, GPIO.HIGH)	# (0, means detect danger gas)
 			time.sleep(0.25)
 			GPIO.output(BEEP, GPIO.LOW)

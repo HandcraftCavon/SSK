@@ -16,13 +16,16 @@ int main(void)
 
 	while(1){
 		if(digitalRead(SwitchPin) == LOW){
-			printf("on !\n");
+			printf("    *******************************\n");
+			printf("    * Detected Magnetic Material! *\n");
+			printf("    *******************************\n\n");
 			digitalWrite(LedPin, HIGH);     //led on
 		}	
 		else{
-			printf("off !\n");
+			printf("\n");
 			digitalWrite(LedPin, LOW);		
 		}
+		delay(500);
 	}
 
 	return 0;

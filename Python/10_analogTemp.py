@@ -7,7 +7,7 @@ def init():
 
 def loop():
 	while True:
-		res = ADC0832.getResult()
+		res = ADC0832.getResult(0)
 		print 'res = %d' % res
 		time.sleep(0.2)
 

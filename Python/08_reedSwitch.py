@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import RPi.GPIO as GPIO
+import time
 
 ReedPin = 11
 LedPin  = 12
@@ -13,11 +14,14 @@ def setup():
 def loop():
 	while True:
 		if GPIO.input(ReedPin) == GPIO.LOW:
-			print '...led on'
-			GPIO.output(LedPin, GPIO.LOW)  # led on
+			print '    *******************************'
+			print '    * Detected Magnetic Material! *'
+			print '    *******************************'
+			GPIO.output(LedPin, GPIO.HIGH)  # led on
 		else:
-			print 'led off...'
-			GPIO.output(LedPin, GPIO.HIGH) # led off
+			print ''
+			GPIO.output(LedPin, GPIO.LOW) # led offi
+		time.sleep(0.5)
 
 def destroy():
 	GPIO.output(LedPin, GPIO.HIGH)     # led off

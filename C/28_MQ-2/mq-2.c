@@ -7,7 +7,8 @@ typedef unsigned int  uint;
 #define     ADC_CS    0
 #define     ADC_CLK   1
 #define     ADC_DIO   2
-#define     BEEP      3
+#define		MQ_2	  3
+#define     BEEP      4
 
 uchar get_ADC_Result(void)
 {
@@ -53,13 +54,14 @@ uchar get_ADC_Result(void)
 	digitalWrite(ADC_CS,1);
 
 	pinMode(ADC_DIO, OUTPUT);
-	
+
 	return(dat1==dat2) ? dat1 : 0;
 }
 
 int main(void)
 {
-	uchar tmp;
+	uchar analogVal;
+	uchar digitalVal;
 
 	if(wiringPiSetup() == -1){
 		printf("setup wiringPi failed !");
@@ -68,20 +70,27 @@ int main(void)
 
 	pinMode(ADC_CS,  OUTPUT);
 	pinMode(ADC_CLK, OUTPUT);
+	pinMode(MQ_2,    INPUT);
 	pinMode(BEEP,    OUTPUT);
 
 	while(1){
 		pinMode(ADC_DIO, OUTPUT);
-		tmp = get_ADC_Result();
-		printf("%d\n",tmp);
+		analogVal = get_ADC_Result();
+		digitalVal = digitalRead(MQ_2);
 
-		if(tmp > 100){
+		printf("%d\n",analogVal);
+
+		if(digitalVal == 0){
 			digitalWrite(BEEP, 0);
-			delay(500);
+			printf("    ****************\n");
+			printf("    * !! DANGER !! *\n");
+			printf("    ****************\n\n");
+			delay(250);
 			digitalWrite(BEEP, 1);
-			delay(500);
+			delay(250);
 		}else{
 			digitalWrite(BEEP, 0);
+			delay(500);
 		}
 	}
 

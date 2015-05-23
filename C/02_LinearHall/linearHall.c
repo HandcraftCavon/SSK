@@ -7,7 +7,7 @@
 #define       ADC_CS     0
 #define      ADC_CLK     1
 #define      ADC_DIO     2
-//#define  Hall_DO_Pin     3
+#define  Hall_DO_Pin     3
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
@@ -62,6 +62,7 @@ void hallISR(void)
 int main(void)
 {
 	uchar analogVal;
+	uchar digitalVal;
 	uchar mag;
 	
 	if(wiringPiSetup() < 0){
@@ -76,13 +77,17 @@ int main(void)
 */	
 	pinMode(ADC_CS,  OUTPUT);
 	pinMode(ADC_CLK, OUTPUT);
+	pinMode(Hall_DO_Pin, INPUT);
 	
 	while(1){
 		pinMode(ADC_DIO, OUTPUT);
 
 		analogVal = get_ADC_Result();
+		digitalVal = digitalRead(Hall_DO_Pin);
 		mag = 210 - analogVal;
-		printf("Current intensity of magnetic field : %d\n", mag);
+		printf("Current intensity of magnetic field : %d\n\n", mag);
+		if(digitalVal == 0)
+			printf("********************\n* Magnet Approach! *\n********************\n\n");
 		delay(500);
 	}
 
