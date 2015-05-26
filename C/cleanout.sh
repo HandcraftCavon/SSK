@@ -7,6 +7,6 @@
 
 for i in *
 do
-	rm ./$i/a.out > log
+	git rm ./$1/a.out
 done
 rm log
