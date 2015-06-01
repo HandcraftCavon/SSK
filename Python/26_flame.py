@@ -1,24 +1,34 @@
 #!/usr/bin/env python
+
 import RPi.GPIO as GPIO
+import ADC0832
 import time
 
-FlamePin = 11
+FLAME = 15
 
-def init():
-	GPIO.setmode(GPIO.BOARD)	
-	GPIO.setup(FlamePin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-def myISR(ev=None):
-	print "Flame is detected !"
+def setup():
+	GPIO.setmode(GPIO.BOARD)
+	GPIO.setup(FLAME, GPIO.IN)
+	ADC0832.setup()
 
 def loop():
-	GPIO.add_event_detect(FlamePin, GPIO.FALLING, callback=myISR)
 	while True:
-		pass
+		flameVal = ADC0832.getResult(0)
+		print GPIO.input(FLAME)
+		if GPIO.input(FLAME) == 1:
+			print '*********************'
+			print '* !! DETECT FIRE !! *'
+			print '*********************'
+			print ''
+		print flameVal
+		time.sleep(0.5)
 
-if __name__ == '__main__':
-	init()
+def destroy():
+	GPIO.cleanup()
+
+if __name__ == "__main__":
+	setup()
 	try:
 		loop()
-	except KeyboardInterrupt: 
-		print 'The end !'
+	except KeyboardInterrupt:
+		destroy()
