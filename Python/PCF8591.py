@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+#------------------------------------------------------
+#
+#		This is a program for PCF8591 Module.
+#
+#		Warnng! The Analog input MUST NOT be over 3.3V!
+#
+#------------------------------------------------------
 import smbus
 import time
 
@@ -32,5 +39,5 @@ if __name__ == "__main__":
 		print 'AIN1 = ', read(1)
 		tmp = read(0)
 		tmp = tmp*(255-125)/255+125 # LED won't light up below 125, so convert '0-255' to '125-255'
-		write_AOUT(tmp)
+		write(tmp)
 #		time.sleep(0.3)
