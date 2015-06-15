@@ -29,15 +29,21 @@ def setColor(col):   # For example : col = 0x112233
 	p_R.ChangeDutyCycle(R_val)     # Change duty cycle
 	p_G.ChangeDutyCycle(G_val)
 
-try:
+def loop():
 	while True:
 		for col in colors:
 			setColor(col)
 			time.sleep(0.5)
-except KeyboardInterrupt:
+
+def destroy():
 	p_R.stop()
 	p_G.stop()
 	for i in pins:
 		GPIO.output(pins[i], GPIO.HIGH)    # Turn off all leds
 	GPIO.cleanup()
 
+if __name__ == "__main__":
+	try:
+		loop()
+	except KeyboardInterrupt:
+		destroy()

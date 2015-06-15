@@ -65,6 +65,7 @@ void init(){
 	delay(5);
 	send_command(0x01);	// Clear Screen
 	wiringPiI2CWrite(fd, 0x08);
+	printf("I2C LCD1602 initial done!");
 }
 
 void clear(){
@@ -89,10 +90,11 @@ void write(int x, int y, char data[]){
 	}
 }
 
-
+/*
 void main(){
 	fd = wiringPiI2CSetup(LCDAddr);
 	init();
 	write(4, 0, "Hello");
 	write(7, 1, "world!");
 }
+*/
