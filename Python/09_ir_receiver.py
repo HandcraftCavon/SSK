@@ -1,25 +1,24 @@
 #!/usr/bin/env python
 import RPi.GPIO as GPIO
-import time
 
-LedPin = 11    # pin11
+IrPin  = 11
+count = 0
 
 def setup():
 	GPIO.setmode(GPIO.BOARD)       # Numbers GPIOs by physical location
-	GPIO.setup(LedPin, GPIO.OUT)   # Set LedPin's mode is output
-	GPIO.output(LedPin, GPIO.HIGH) # Set LedPin high(+3.3V) to off led
+	GPIO.setup(IrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+def cnt(ev=None):
+	global count
+	count += 1
+	print 'Recevied infrared. cnt = ', count
 
 def loop():
+	GPIO.add_event_detect(IrPin, GPIO.FALLING, callback=cnt) # wait for falling
 	while True:
-		print '...led on'
-		GPIO.output(LedPin, GPIO.LOW)  # led on
-		time.sleep(0.5)
-		print 'led off...'
-		GPIO.output(LedPin, GPIO.HIGH) # led off
-		time.sleep(0.5)
+		pass   # Don't do anything
 
 def destroy():
-	GPIO.output(LedPin, GPIO.HIGH)     # led off
 	GPIO.cleanup()                     # Release resource
 
 if __name__ == '__main__':     # Program start from here
