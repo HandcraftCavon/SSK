@@ -13,13 +13,11 @@ void LED(char* color)
 	{
 		digitalWrite(Rpin, HIGH);
 		digitalWrite(Gpin, LOW);
-		printf("Red\n");
 	}
 	else if (color == "GREEN")
 	{
 		digitalWrite(Rpin, LOW);
 		digitalWrite(Gpin, HIGH);
-		printf("Green\n");
 	}
 	else
 		printf("LED Error");
@@ -40,6 +38,7 @@ int main(void)
 			delay(10);
 			if(0 == digitalRead(TiltPin)){
 				LED("RED");
+				printf("Tilt!\n");
 			}
 		}
 		else if(1 == digitalRead(TiltPin)){

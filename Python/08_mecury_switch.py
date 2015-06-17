@@ -13,17 +13,22 @@ def setup():
 
 def Led(x):
 	if x == 0:
-		print 'Red'
 		GPIO.output(Rpin, 1)
 		GPIO.output(Gpin, 0)
 	if x == 1:
-		print 'Green'
 		GPIO.output(Rpin, 0)
 		GPIO.output(Gpin, 1)
+
+def Print(x):
+	if x == 0:
+		print '    ********************'
+		print '    *   Mecury tilt!   *'
+		print '    ********************'
 
 def loop():
 	while True:
 		Led(GPIO.input(MPin))
+		Print(GPIO.input(MPin))
 
 
 def destroy():

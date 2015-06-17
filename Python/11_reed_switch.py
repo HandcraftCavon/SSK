@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import RPi.GPIO as GPIO
 
-BtnPin = 11
+ReedPin = 11
 Gpin   = 12
 Rpin   = 13
 
@@ -9,7 +9,7 @@ def setup():
 	GPIO.setmode(GPIO.BOARD)       # Numbers GPIOs by physical location
 	GPIO.setup(Gpin, GPIO.OUT)     # Set Green Led Pin mode to output
 	GPIO.setup(Rpin, GPIO.OUT)     # Set Red Led Pin mode to output
-	GPIO.setup(BtnPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
+	GPIO.setup(ReedPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
 
 def Led(x):
 	if x == 0:
@@ -21,14 +21,14 @@ def Led(x):
 
 def Print(x):
 	if x == 0:
-		print '    ***********************'
-		print '    *   Button Pressed!   *'
-		print '    ***********************'
+		print '    *******************************'
+		print '    * Detected Magnetic Material! *'
+		print '    *******************************'
 
 def loop():
 	while True:
-		Led(GPIO.input(BtnPin))
-		Print(GPIO.input(BtnPin))
+		Led(GPIO.input(ReedPin))
+		Print(GPIO.input(ReedPin))
 
 
 def destroy():

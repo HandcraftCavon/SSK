@@ -1,7 +1,7 @@
 #include <wiringPi.h>
 #include <stdio.h>
 
-#define MPin		0
+#define ReedPin		0
 #define Gpin		1
 #define Rpin		2
 
@@ -30,21 +30,21 @@ int main(void)
 		return 1; 
 	}
 
-	pinMode(MPin, INPUT);
+	pinMode(ReedPin, INPUT);
 	LED("GREEN");
 	
 	while(1){
-		if(0 == digitalRead(MPin)){
+		if(0 == digitalRead(ReedPin)){
 			delay(10);
-			if(0 == digitalRead(MPin)){
+			if(0 == digitalRead(ReedPin)){
 				LED("RED");	
-				printf("Mecury Tilt!\n");
+				printf("Detected Magnetic Material!\n");	
 			}
 		}
-		else if(1 == digitalRead(MPin)){
+		else if(1 == digitalRead(ReedPin)){
 			delay(10);
-			if(1 == digitalRead(MPin)){
-				while(!digitalRead(MPin));
+			if(1 == digitalRead(ReedPin)){
+				while(!digitalRead(ReedPin));
 				LED("GREEN");
 			}
 		}

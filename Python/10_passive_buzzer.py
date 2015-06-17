@@ -52,7 +52,7 @@ def setup():
 	Buzz.start(50)					# Start Buzzer pin with 50% duty ration
 
 def loop():
-	while Ture:
+	while True:
 		print '\n    Playing song 1...'
 		for i in range(1, len(song_1)):		# Play song 1
 			Buzz.ChangeFrequency(song_1[i])	# Change the frequency along the song note

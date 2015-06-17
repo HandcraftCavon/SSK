@@ -81,32 +81,27 @@ int main(void)
 		pinMode(ADC_DIO, OUTPUT);
 
 		xVal = get_ADC_Result('x');
-		if(xVal == 0){
-			tmp = 1; //up	
-		}
-		if(xVal == 255){
+		if(xVal == 0)
+			tmp = 1; //up
+		if(xVal == 255)
 			tmp = 2; //down
-		}
 
 		yVal = get_ADC_Result('y');
-		if(yVal == 0){
+		if(yVal == 0)
 			tmp = 3; //left
-		}
-		if(yVal == 255){
+		if(yVal == 255)
 			tmp = 4; //right
-		}
 
 		zVal = digitalRead(JoyStick_Z);
-		if(zVal == 0){
-			printf("Button is pressed !\n");
-		}
+		if(zVal == 0)
+			tmp = 5; //button pressed
 
-		//printf("x : %d   y : %d   z : %d\n", xVal, yVal, zVal);
 		switch(tmp){
-			case 1: printf("up\n"); break;
-			case 2: printf("down\n"); break;
-			case 3: printf("right\n"); break;
-			case 4: printf("left\n"); break;
+			case 1: printf("up\n");              break;
+			case 2: printf("down\n");            break;
+			case 3: printf("right\n");           break;
+			case 4: printf("left\n");            break;
+			case 5: printf("Button Pressed!\n"); break;
 			default:
 				break;
 		}

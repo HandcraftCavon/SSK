@@ -12,9 +12,9 @@ def setup():
 def loop():
 	while True:
 		GPIO.output(BuzzerPin, GPIO.LOW)
-		time.sleep(0.5)
+		time.sleep(0.1)
 		GPIO.output(BuzzerPin, GPIO.HIGH)
-		time.sleep(0.5)
+		time.sleep(0.1)
 
 def destroy():
 	GPIO.output(BuzzerPin, GPIO.HIGH)
