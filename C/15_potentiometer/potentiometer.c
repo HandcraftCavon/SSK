@@ -53,7 +53,7 @@ uchar get_ADC_Result(void)
 int main(void)
 {
 	uchar analogVal;
-	uchar illum;
+	uchar tmp = 0;
 
 	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
 		printf("setup wiringPi failed !");
@@ -67,10 +67,10 @@ int main(void)
 		pinMode(ADC_DIO, OUTPUT);
 
 		analogVal = get_ADC_Result();
-		illum = 210 - analogVal;
-		printf("Current illumination : %d\n", illum);
-		delay(500);
+		if (analogVal != tmp){
+			printf("%d\n", analogVal);
+			tmp = analogVal;
+		}
 	}
-
 	return 0;
 }

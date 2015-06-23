@@ -1,2 +1,0 @@
-NOTE:
-	Beep's pin 'SIG' must be connected to GPIO3, 'GND' must be connected to Ground, and VCC should be connected to 3.3V.

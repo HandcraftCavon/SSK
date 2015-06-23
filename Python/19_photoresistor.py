@@ -7,12 +7,8 @@ def init():
 
 def loop():
 	while True:
-		res = ADC0832.getResult() - 80
-		if res < 0:
-			res = 0
-		if res > 100:
-			res = 100
-		print 'res = %d' % res
+		res = 210 - ADC0832.getResult(0)
+		print 'Current illumination : ', res
 		time.sleep(0.2)
 
 if __name__ == '__main__':
@@ -21,4 +17,3 @@ if __name__ == '__main__':
 		loop()
 	except KeyboardInterrupt: 
 		ADC0832.destroy()
-		print 'The end !'

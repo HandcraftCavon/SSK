@@ -1,5 +1,6 @@
 #include <wiringPi.h>
 #include <stdio.h>
+#include <math.h>
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
@@ -7,6 +8,7 @@ typedef unsigned int uint;
 #define     ADC_CS    0
 #define     ADC_CLK   1
 #define     ADC_DIO   2
+#define     TPin      3
 
 uchar get_ADC_Result(void)
 {
@@ -53,7 +55,7 @@ uchar get_ADC_Result(void)
 int main(void)
 {
 	uchar analogVal;
-	uchar temp;
+	double Rt, Vr, temp;
 
 	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
 		printf("setup wiringPi failed !");
@@ -62,13 +64,20 @@ int main(void)
 
 	pinMode(ADC_CS,  OUTPUT);
 	pinMode(ADC_CLK, OUTPUT);
+	pinMode(TPin,    INPUT);
 
 	while(1){
 		pinMode(ADC_DIO, OUTPUT);
 
 		analogVal = get_ADC_Result();
-		temp = 140 - analogVal;
-		printf("Current temperature : %d\n", temp);
+		Vr = 5 * (double)(analogVal) / 255;
+		Rt = 10000 * (double)(Vr) / (5 - (double)(Vr));
+		temp = 1 / (((log(Rt/10000)) / 3950)+(1 / (273.15 + 25)));
+		temp = temp - 273.15;
+		printf("Current temperature : %lf\n", temp);
+		if (digitalRead(TPin) == 0){
+			printf("Too Hot!\n");
+		}
 		delay(500);
 	}
 

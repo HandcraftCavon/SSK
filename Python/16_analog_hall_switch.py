@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#/usr/bin/env python
 import RPi.GPIO as GPIO
 import ADC0832
 import time
@@ -13,7 +13,7 @@ def setup():
 def loop():
 	while True:
 		res = ADC0832.getResult(0)
-		print 'Current intensity of magnetic field : ', res
+		print 'Current intensity of magnetic field : ', 210-res
 		if (GPIO.input(HALL_DO) == 0):
 			print ''
 			print '********************'
