@@ -11,8 +11,7 @@
 
 #define MAXTIMINGS 85
 
-#define DHTPIN 1
-//#define DHTPIN 7
+#define DHTPIN 0
 
 int dht11_dat[5] = {0,0,0,0,0};
 

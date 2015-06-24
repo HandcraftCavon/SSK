@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <wiringPi.h>
 
-#define  SWPin     0
-#define  RoAPin    1
-#define  RoBPin    2
+#define  RoAPin    0
+#define  RoBPin    1
+#define  SWPin     2
 
 static volatile int globalCounter = 0 ;
 
@@ -57,10 +57,14 @@ int main(void)
 		return 1;
 	}
 	
+	int tmp = 0;
+
 	while(1){
 		rotaryDeal();
-		printf("%d\n", globalCounter);
-		//printf("%d\n",globalCounter);
+		if (tmp != globalCounter){
+			printf("%d\n", globalCounter);
+			tmp = globalCounter;
+		}
 	}
 
 	return 0;

@@ -5,7 +5,7 @@ import time
 spi = spidev.SpiDev()
 spi.open(0,0)
 
-def get_adc(channel):
+def read(channel):
 	#Perform SPI transaction and store returned bits in 'r'
 	r = spi.xfer([1, (8+channel)<<4, 0])
 	#Filter data bits from returned bits
@@ -15,7 +15,7 @@ def get_adc(channel):
 
 def loop():
 	while True:
-		print get_adc(1)
+		print read(0)
 		time.sleep(1)
 
 if __name__ == "__main__":

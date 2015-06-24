@@ -5,6 +5,8 @@ TouchPin = 11
 Gpin   = 12
 Rpin   = 13
 
+tmp = 0
+
 def setup():
 	GPIO.setmode(GPIO.BOARD)       # Numbers GPIOs by physical location
 	GPIO.setup(Gpin, GPIO.OUT)     # Set Green Led Pin mode to output
@@ -18,22 +20,26 @@ def Led(x):
 	if x == 1:
 		GPIO.output(Rpin, 0)
 		GPIO.output(Gpin, 1)
+	
 
 def Print(x):
-	if x == 0:
-		print '    **********'
-		print '    *     ON *'
-		print '    **********'
+	global tmp
+	if x != tmp:
+		if x == 0:
+			print '    **********'
+			print '    *     ON *'
+			print '    **********'
 	
-	if x == 1:
-		print '    **********'
-		print '    * OFF    *'
-		print '    **********'
+		if x == 1:
+			print '    **********'
+			print '    * OFF    *'
+			print '    **********'
+		tmp = x
 
 def loop():
 	while True:
-		print GPIO.input(TouchPin)
-#		Led(not (GPIO.input(TouchPin)))
+		Led(GPIO.input(TouchPin))
+		Print(GPIO.input(TouchPin))
 
 def destroy():
 	GPIO.output(Gpin, GPIO.HIGH)       # Green led off

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-import PCF8591
+import PCF8591 as ADC
 
 def loop():
 	while True:
-		PCF8591.write(PCF8591.read(0))
+		ADC.write(ADC.read(0))
 
 def destroy():
-	PCF8591.write(0)
+	ADC.write(0)
 
 if __name__ == "__main__":
 	try:
