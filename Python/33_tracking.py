@@ -13,10 +13,10 @@ def setup():
 def loop():
 	while True:
 		if GPIO.input(TrackPin) == GPIO.LOW:
-			print '...led on'
+			print 'White line is detected'
 			GPIO.output(LedPin, GPIO.LOW)  # led on
 		else:
-			print 'led off...'
+			print '...Black line is detected'
 			GPIO.output(LedPin, GPIO.HIGH) # led off
 
 def destroy():

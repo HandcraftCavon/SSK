@@ -9,6 +9,8 @@
 
 #define  BUFSIZE  128
 
+char* addr = "/sys/bus/w1/devices/28-031467805fff/w1_slave";
+
 int main(void)
 {
 	float temp;
@@ -18,8 +20,8 @@ int main(void)
 
 	char buf[BUFSIZE];
 	char tempBuf[5];
-	
-	fd = open("/sys/bus/w1/devices/28-00000495db35/w1_slave", O_RDONLY);
+	while (1){
+	fd = open(addr, O_RDONLY);
 
 	if(-1 == fd){
 		perror("open device file error");
@@ -54,6 +56,6 @@ int main(void)
 	printf("%.3f C\n",temp);
 
 	close(fd);
-
+	}
 	return 0;
 }

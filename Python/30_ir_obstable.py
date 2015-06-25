@@ -10,7 +10,7 @@ def setup():
 def loop():
 	while True:
 		if (0 == GPIO.input(ObstaclePin)):
-			print "Barrier is detected !"
+			print "Detected Barrier!"
 			
 
 def destroy():
