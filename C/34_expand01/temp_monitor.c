@@ -41,7 +41,7 @@ float tempRead(void)
 	char buf[BUFSIZE];
 	char tempBuf[5];
 	
-	fd = open("/sys/bus/w1/devices/28-00000495db35/w1_slave", O_RDONLY);
+	fd = open("/sys/bus/w1/devices/28-031467805fff/w1_slave", O_RDONLY);
 
 	if(-1 == fd){
 		perror("open device file error");
@@ -126,22 +126,22 @@ int main(int argc, char *argv[])
 		printf("The upper limit of temperature : %d\n", high);
 		printf("Current temperature : %0.3f\n", temp);
 		if(temp < low){
-			ledCtrl(LedBlue, HIGH);
-			ledCtrl(LedRed, LOW);
-			ledCtrl(LedGreen, LOW);
+			ledCtrl(LedBlue,  LOW);
+			ledCtrl(LedRed,   HIGH);
+			ledCtrl(LedGreen, HIGH);
 			for(i = 0;i < 3; i++){
 				beepCtrl(500);
 			}
 		}
 		if(temp >= low && temp < high){
-			ledCtrl(LedBlue, LOW);
-			ledCtrl(LedRed, LOW);
-			ledCtrl(LedGreen, HIGH);
+			ledCtrl(LedBlue,  HIGH);
+			ledCtrl(LedRed,   HIGH);
+			ledCtrl(LedGreen, LOW);
 		}
 		if(temp >= high){
-			ledCtrl(LedBlue, LOW);
-			ledCtrl(LedRed, HIGH);
-			ledCtrl(LedGreen, LOW);
+			ledCtrl(LedBlue,  HIGH);
+			ledCtrl(LedRed,   LOW);
+			ledCtrl(LedGreen, HIGH);
 			for(i = 0;i < 3; i++){
 				beepCtrl(100);
 			}
