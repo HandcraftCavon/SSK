@@ -1,35 +1,33 @@
 #include <wiringPi.h>
 #include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <stdlib.h>
+
+typedef unsigned char uchar;
+typedef unsigned int  uint;
 
 #define     ADC_CS    0
 #define     ADC_CLK   1
 #define     ADC_DIO   2
 
-#define  MIC_DO_Pin   3
-
-typedef unsigned char uchar;
-typedef unsigned int uint;
-
-
 uchar get_ADC_Result(void)
 {
+	//10:CH0
+	//11:CH1
 	uchar i;
 	uchar dat1=0, dat2=0;
 
 	digitalWrite(ADC_CS, 0);
+
 	digitalWrite(ADC_CLK,0);
 	digitalWrite(ADC_DIO,1);	delayMicroseconds(2);
 	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
+	digitalWrite(ADC_CLK,0);
 
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
+	digitalWrite(ADC_DIO,1);    delayMicroseconds(2); //CH0 10
 	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
+	digitalWrite(ADC_CLK,0);
 
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,0);	delayMicroseconds(2);
+	digitalWrite(ADC_DIO,0);	delayMicroseconds(2); //CH0 0
+	
 	digitalWrite(ADC_CLK,1);	
 	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
 	digitalWrite(ADC_CLK,0);	
@@ -52,44 +50,37 @@ uchar get_ADC_Result(void)
 	}
 
 	digitalWrite(ADC_CS,1);
-	
-	return(dat1==dat2) ? dat1 : 0;
-}
 
-void micISR(void)
-{
-	uchar analogVal;
-
-	printf("voice in \n");
-	
 	pinMode(ADC_DIO, OUTPUT);
 
-	analogVal = get_ADC_Result();
-	printf("Current analog : %d\n", analogVal);
+	return(dat1==dat2) ? dat1 : 0;
 }
 
 int main(void)
 {
+	uchar analogVal;
+	uchar digitalVal;
 
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
+	if(wiringPiSetup() == -1){
 		printf("setup wiringPi failed !");
 		return 1; 
-	}
-    
-	if(wiringPiISR(MIC_DO_Pin, INT_EDGE_RISING, &micISR) < 0){
-		fprintf(stderr, "Unable to init ISR\n",strerror(errno));	
-		return 1;
 	}
 
 	pinMode(ADC_CS,  OUTPUT);
 	pinMode(ADC_CLK, OUTPUT);
 
-	printf("Please speaking...\n");
-
+	int a = 0;
 	while(1){
-	
+		pinMode(ADC_DIO, OUTPUT);
+		analogVal = get_ADC_Result();
+
+//		printf("%d\n",analogVal);
+
+		if(analogVal < 20){
+			printf("Voice In!!  %d\n", a);
+			a += 1;
+		}
 	}
 
 	return 0;
 }
-

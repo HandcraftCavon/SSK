@@ -10,6 +10,7 @@ def setup():
 	GPIO.setup(Gpin, GPIO.OUT)     # Set Green Led Pin mode to output
 	GPIO.setup(Rpin, GPIO.OUT)     # Set Red Led Pin mode to output
 	GPIO.setup(BtnPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
+	GPIO.add_event_detect(BtnPin, GPIO.BOTH, callback=detect, bouncetime=200)
 
 def Led(x):
 	if x == 0:
@@ -25,11 +26,13 @@ def Print(x):
 		print '    *   Button Pressed!   *'
 		print '    ***********************'
 
+def detect(chn):
+	Led(GPIO.input(BtnPin))
+	Print(GPIO.input(BtnPin))
+
 def loop():
 	while True:
-		Led(GPIO.input(BtnPin))
-		Print(GPIO.input(BtnPin))
-
+		pass
 
 def destroy():
 	GPIO.output(Gpin, GPIO.HIGH)       # Green led off

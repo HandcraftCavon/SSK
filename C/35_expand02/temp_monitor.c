@@ -17,7 +17,7 @@
 
 #define  JoyStick_Z   6
 
-#define        Beep   8
+#define        Beep   10 
 
 #define     BUFSIZE   128
 
@@ -59,7 +59,7 @@ float tempRead(void)
 	char buf[BUFSIZE];
 	char tempBuf[5];
 	
-	fd = open("/sys/bus/w1/devices/28-00000495db35/w1_slave", O_RDONLY);
+	fd = open("/sys/bus/w1/devices/28-031467805fff/w1_slave", O_RDONLY);
 
 	if(-1 == fd){
 		perror("open device file error");
@@ -223,10 +223,10 @@ int main(void)
 		joyStick = get_joyStick_state();
 
 		switch(joyStick){
-			case 1 : ++low;  break; 
-			case 2 : --low;  break;
-			case 3 : --high; break;
-			case 4 : ++high; break;
+			case 1 : --low;  break; 
+			case 2 : ++low;  break;
+			case 3 : ++high; break;
+			case 4 : --high; break;
 			default: break;
 		}
 		
@@ -243,22 +243,22 @@ int main(void)
 		printf("Current temperature : %0.3f\n", temp);
 		
 		if(temp < low){
-			ledCtrl(LedBlue, HIGH);
-			ledCtrl(LedRed, LOW);
+			ledCtrl(LedBlue,  LOW);
+			ledCtrl(LedRed,   HIGH);
 			ledCtrl(LedGreen, LOW);
 			for(i = 0;i < 3; i++){
 				beepCtrl(400);
 			}
 		}
 		if(temp >= low && temp < high){
-			ledCtrl(LedBlue, LOW);
-			ledCtrl(LedRed, LOW);
-			ledCtrl(LedGreen, HIGH);
+			ledCtrl(LedBlue,  HIGH);
+			ledCtrl(LedRed,   HIGH);
+			ledCtrl(LedGreen, LOW);
 		}
 		if(temp >= high){
-			ledCtrl(LedBlue, LOW);
-			ledCtrl(LedRed, HIGH);
-			ledCtrl(LedGreen, LOW);
+			ledCtrl(LedBlue,  HIGH);
+			ledCtrl(LedRed,   LOW);
+			ledCtrl(LedGreen, HIGH);
 			for(i = 0;i < 3; i++){
 				beepCtrl(80);
 			}

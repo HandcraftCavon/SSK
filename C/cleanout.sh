@@ -7,6 +7,6 @@
 
 for i in *
 do
-	git rm ./$i/a.out
+	git rm -f ./$i/a.out
 done
 rm log

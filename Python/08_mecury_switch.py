@@ -10,6 +10,7 @@ def setup():
 	GPIO.setup(Gpin, GPIO.OUT)     # Set Green Led Pin mode to output
 	GPIO.setup(Rpin, GPIO.OUT)     # Set Red Led Pin mode to output
 	GPIO.setup(MPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
+	GPIO.add_event_detect(MPin, GPIO.BOTH, callback=detect, bouncetime=200)
 
 def Led(x):
 	if x == 0:
@@ -22,14 +23,16 @@ def Led(x):
 def Print(x):
 	if x == 0:
 		print '    ********************'
-		print '    *   Mecury tilt!   *'
+		print '    *   Mecury Tilt!   *'
 		print '    ********************'
+
+def detect(chn):
+	Led(GPIO.input(MPin))
+	Print(GPIO.input(MPin))
 
 def loop():
 	while True:
-		Led(GPIO.input(MPin))
-		Print(GPIO.input(MPin))
-
+		pass
 
 def destroy():
 	GPIO.output(Gpin, GPIO.HIGH)       # Green led off

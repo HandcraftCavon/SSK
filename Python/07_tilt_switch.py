@@ -10,6 +10,7 @@ def setup():
 	GPIO.setup(Gpin, GPIO.OUT)     # Set Green Led Pin mode to output
 	GPIO.setup(Rpin, GPIO.OUT)     # Set Red Led Pin mode to output
 	GPIO.setup(TiltPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
+	GPIO.add_event_detect(TiltPin, GPIO.BOTH, callback=detect, bouncetime=200)
 
 def Led(x):
 	if x == 0:
@@ -25,11 +26,13 @@ def Print(x):
 		print '    *   Tilt!   *'
 		print '    *************'
 
+def detect(chn):
+	Led(GPIO.input(TiltPin))
+	Print(GPIO.input(TiltPin))
+
 def loop():
 	while True:
-		Led(GPIO.input(TiltPin))
-		Print(GPIO.input(TiltPin))
-
+		pass
 
 def destroy():
 	GPIO.output(Gpin, GPIO.HIGH)       # Green led off

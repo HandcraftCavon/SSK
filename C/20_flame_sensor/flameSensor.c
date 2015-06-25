@@ -78,7 +78,7 @@ int main(void)
 
 		printf("%d\n",analogVal);
 
-		if(digitalVal == 1){
+		if(digitalVal == 0){
 			printf("    *********************\n");
 			printf("    * !! DETECT FIRE !! *\n");
 			printf("    *********************\n\n");

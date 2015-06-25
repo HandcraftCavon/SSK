@@ -15,7 +15,7 @@ def loop():
 	while True:
 		flameVal = ADC0832.getResult(0)
 		print GPIO.input(FLAME)
-		if GPIO.input(FLAME) == 1:
+		if GPIO.input(FLAME) == 0:
 			print '*********************'
 			print '* !! DETECT FIRE !! *'
 			print '*********************'

@@ -28,11 +28,11 @@ ADC_CS  = 11
 ADC_CLK = 12
 ADC_DIO = 13
 
-def setup():
-	GPIO.setwarnings(False)
-	GPIO.setmode(GPIO.BOARD)    		# Number GPIOs by its physical location
-	GPIO.setup(ADC_CS, GPIO.OUT)		# Set pins' mode is output
-	GPIO.setup(ADC_CLK, GPIO.OUT)		# Set pins' mode is output
+#def setup():
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)    		# Number GPIOs by its physical location
+GPIO.setup(ADC_CS, GPIO.OUT)		# Set pins' mode is output
+GPIO.setup(ADC_CLK, GPIO.OUT)		# Set pins' mode is output
 
 def destroy():
 	GPIO.cleanup()
@@ -79,11 +79,14 @@ def getResult(chn):     				# Get ADC result, input channal
 		else:
 			return 0
 
+def read(chn):
+	return getResult(chn)
+
 def loop():
 	while True:
 		res = getResult(0)
 		print 'res = %d' % res
-		time.sleep(0.4)
+#		time.sleep(0.4)
 
 def destory():
 	GPIO.cleanup()				# Release resource
