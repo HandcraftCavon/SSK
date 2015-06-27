@@ -23,8 +23,8 @@
 
 static unsigned int masks [] = { 0x7F, 0x7F, 0x3F, 0x3F, 0x1F, 0x07, 0xFF } ;
 
-//bcdToD: dToBCD:
 
+// bcdToD: dToBCD:
 static int bcdToD (unsigned int byte, unsigned int mask)
 {
   unsigned int b1, b2 ;
@@ -39,13 +39,7 @@ static unsigned int dToBcd (unsigned int byte)
   return ((byte / 10) << 4) + (byte % 10) ;
 }
 
-
-/*
- * ramTest:
- *	Simple test of the 31 bytes of RAM inside the DS1302 chip
- *********************************************************************************
- */
-
+// ramTest:
 static int ramTestValues [] =
   { 0x00, 0xFF, 0xAA, 0x55, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0xF0, 0x0F, -1 } ;
 
@@ -95,12 +89,7 @@ static int ramTest (void)
   return 0 ;
 }
 
-/*
- * setLinuxClock:
- *	Set the Linux clock from the hardware
- *********************************************************************************
- */
-
+// setLinuxClock:
 static int setLinuxClock (void)
 {
   char dateTime [20] ;
@@ -130,35 +119,35 @@ static int setLinuxClock (void)
 }
 
 
-/*
- * setDSclock:
- *	Set the DS1302 block from Linux time
- *********************************************************************************
- */
 
+// setDSclock:
 static int setDSclock (void)
 {
-  unsigned long time;
-  unsigned long date;
-  int weekday;
+  struct tm t ;
+  time_t now ;
   int clock [8] ;
+  int time = 0 ;
+  int date = 0 ;
+  int weekday = 0 ;
 
-  getchar();
-  fflush(stdin);
-  printf ("Setting the clock in the DS1302 by hand type... ") ;
+  printf ("Setting the clock in the DS1302 from type in... ") ;
 
-  scanf("%ld", &date);
-  scanf("%ld", &time);
-  scanf("%d", &weekday);
+  printf ("\n\nEnter Date(YYMMDD): ") ;
+  scanf ("%d", &date) ;
+  printf ("Enter time(HHMMSS, 24-hour clock): ") ;
+  scanf ("%d", &time) ;
+  printf ("Enter Weekday(0 as sunday): ") ;
+  scanf ("%d", &weekday) ;
+//  printf("\ndate: %d,  time: %d\n\n", date, time) ;
 
-  clock [ 0] = dToBcd (time%100) ;		// seconds
-  clock [ 1] = dToBcd (time/100%100) ;	// mins
-  clock [ 2] = dToBcd (time/100/100) ;	// hours
-  clock [ 3] = dToBcd (date%100) ;		// date
-  clock [ 4] = dToBcd (date/100%100) ;	// months
-  clock [ 5] = dToBcd (weekday) ;		// weekdays
-  clock [ 6] = dToBcd (date/100) ;      // years
-  clock [ 7] = 0 ;						// W-Protect off
+  clock [ 0] = dToBcd (time % 100) ;	// seconds
+  clock [ 1] = dToBcd (time / 100 % 100) ;	// mins
+  clock [ 2] = dToBcd (time / 100 / 100) ;	// hours
+  clock [ 3] = dToBcd (date % 100) ;	// date
+  clock [ 4] = dToBcd (date / 100 % 100) ;	// months 0-11 --> 1-12
+  clock [ 5] = dToBcd (weekday) ;	// weekdays (sun 0)
+  clock [ 6] = dToBcd (date / 100 / 100) ;       // years
+  clock [ 7] = 0 ;			// W-Protect off
 
   ds1302clockWrite (clock) ;
 
@@ -167,10 +156,20 @@ static int setDSclock (void)
   return 0 ;
 }
 
+
+
+
 int main (int argc, char *argv [])
 {
   int i ;
   int clock [8] ;
+  int year ;
+  int month ;
+  int date ;
+  int hour ;
+  int minute ;
+  int second ;
+  int weekday ;
 
   wiringPiSetup () ;
   ds1302setup   (0, 1, 2) ;
@@ -179,7 +178,7 @@ int main (int argc, char *argv [])
   {
     /**/ if (strcmp (argv [1], "-slc") == 0)
       return setLinuxClock () ;
-    else if (strcmp (argv [1], "-sbh") == 0)
+    else if (strcmp (argv [1], "-sdsc") == 0)
       return setDSclock () ;
     else if (strcmp (argv [1], "-rtest") == 0)
       return ramTest () ;
@@ -195,12 +194,29 @@ int main (int argc, char *argv [])
     printf ("%5d:  ", i) ;
 
     ds1302clockRead (clock) ;
-    printf (" %2d:%02d:%02d",
-	bcdToD (clock [2], masks [2]), bcdToD (clock [1], masks [1]), bcdToD (clock [0], masks [0])) ;
+    
+	hour   = bcdToD (clock [2], masks [2]) ;
+	minute = bcdToD (clock [1], masks [1]) ;
+	second = bcdToD (clock [0], masks [0]) ;
 
-    printf (" %2d/%02d/%04d",
-	bcdToD (clock [3], masks [3]), bcdToD (clock [4], masks [4]), bcdToD (clock [6], masks [6]) + 2000) ;
-      
+    date  = bcdToD (clock [3], masks [3]) ;
+	month = bcdToD (clock [4], masks [4]) ;
+	year  = bcdToD (clock [6], masks [6]) + 2000 ;
+	weekday = bcdToD (clock [5], masks [5]) ;
+
+	printf ("  %04d-%02d-%02d", year, month, date) ;
+	printf ("  %02d:%02d:%02d", hour, minute, second) ;
+    
+    switch (weekday){
+      case 0: printf ("  SUN") ; break;
+	  case 1: printf ("  MON") ; break;
+	  case 2: printf ("  TUE") ; break;
+	  case 3: printf ("  WED") ; break;
+	  case 4: printf ("  THU") ; break;
+	  case 5: printf ("  FRI") ; break;
+	  case 6: printf ("  SAT") ; break;
+	}
+
     printf ("\n") ;
 
     delay (200) ;
