@@ -4,6 +4,16 @@
 #		This is a program for PCF8591 Module.
 #
 #		Warnng! The Analog input MUST NOT be over 3.3V!
+#    
+#		In this script, we use a poteniometer for analog
+#   input, and a LED on AO for analog output.
+#
+#		you can import this script to another by:
+#	import PCF8591 as ADC
+#	
+#	ADC.Setup(Address)  # Check it by sudo i2cdetect -y -1
+#	ADC.read(channal)	# Channal range from 0 to 3
+#	ADC.write(Value)	# Value range from 0 to 255		
 #
 #------------------------------------------------------
 import smbus
@@ -13,7 +23,9 @@ import time
 bus = smbus.SMBus(1)
 
 #check your PCF8591 address by type in 'sudo i2cdetect -y -1' in terminal.
-address = 0x48
+def Setup(Addr):
+	global address
+	address = Addr
 
 def read(chn): #channel
 	if chn == 0:
@@ -34,6 +46,7 @@ def write(val):
 	bus.write_byte_data(address, 0x40, temp)
 
 if __name__ == "__main__":
+	Setup(0x48)
 	while True:
 		print 'AIN0 = ', read(0)
 		print 'AIN1 = ', read(1)
