@@ -56,9 +56,9 @@ end
 
 begin
   remote = *
-  button = KEY_EQUA
+  button = KEY_EQUAL
   prog = pylirc
-  config = KEY_EQUA
+  config = KEY_EQUAL
 end
 
 begin
