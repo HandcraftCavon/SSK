@@ -1,66 +1,146 @@
 begin
   remote = *
   button = KEY_CHANNELDOWN
-  prog = pylirc
-  config = x
+  prog = 23_ircontrol
+  config = KEY_CHANNELDOWN
 end
 
 begin
   remote = *
-  button = 1
-  prog = pylirc
-  config = testtest
+  button = KEY_CHANNEL
+  prog = 23_ircontrol
+  config = KEY_CHANNEL
 end
 
 begin
   remote = *
-  button = 2
-  prog = pylirc
-  config = double
-  config = up
+  button = KEY_CHANNELUP
+  prog = 23_ircontrol
+  config = KEY_CHANNELUP
 end
 
 begin
   remote = *
-  button = 3
-  prog = pylirc
-  config = quit
+  button = KEY_PREVIOUS
+  prog = 23_ircontrol
+  config = KEY_PREVIOUS
 end
 
 begin
   remote = *
-  button = 4
-  prog = pylirc
-  config = blocking
+  button = KEY_NEXT
+  prog = 23_ircontrol
+  config = KEY_NEXT
 end
 
 begin
   remote = *
-  button = 5
-  prog = pylirc
-  config = nonblocking
-end
-
-
-
-begin
-  remote = *
-  button = 1
-  prog = pytwo
-  config = one
+  button = KEY_PLAYPAUSE
+  prog = 23_ircontrol
+  config = KEY_PLAYPAUSE
 end
 
 begin
   remote = *
-  button = 2
-  prog = pytwo
-  config = two
+  button = KEY_VOLUMEDOWN
+  prog = 23_ircontrol
+  config = KEY_VOLUMEDOWN
 end
 
 begin
   remote = *
-  button = 3
-  prog = pytwo
-  config = quit
+  button = KEY_VOLUMEUP
+  prog = 23_ircontrol
+  config = KEY_VOLUMEUP
 end
 
+begin
+  remote = *
+  button = KEY_EQUA
+  prog = 23_ircontrol
+  config = KEY_EQUA
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_0
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_0
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_1
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_1
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_2
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_2
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_3
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_3
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_4
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_4
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_5
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_5
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_6
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_6
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_7
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_7
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_8
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_8
+end
+
+begin
+  remote = *
+  button = KEY_NUMERIC_9
+  prog = 23_ircontrol
+  config = KEY_NUMERIC_9
+end
+
+begin
+  remote = *
+  button = BTN_0
+  prog = 23_ircontrol
+  config = BTN_0
+ end
+
+begin
+  remote = *
+  button = BTN_1
+  prog = 23_ircontrol
+  config = BTN_1:
+end
