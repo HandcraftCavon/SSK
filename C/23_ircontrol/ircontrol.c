@@ -1,7 +1,7 @@
 #include <wiringPi.h>
-#include <errno.h>
 #include <softPwm.h>
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <lirc/lirc_client.h>
@@ -9,16 +9,12 @@
 
 #define uchar unsigned char
 
-//The WiringPi pin numbers used by our LEDs
-#define Rpin 0
-#define Gpin 1
-#define Bpin 2
- 
-#define ON 1
-#define OFF 0
+#define LedPinRed    0
+#define LedPinGreen  1
+#define LedPinBlue   2
 
-uchar color[3] = {0x00, 0x00, 0x00};
-uchar Lv[3]    = {0x00, 0x33, 0xE6};
+uchar color[3] = {0xff, 0xff, 0xff};
+uchar Lv[3]    = {0xff, 0x44, 0x00};
 
 char *keymap[21] ={
 	" KEY_CHANNELDOWN ",
@@ -43,22 +39,18 @@ char *keymap[21] ={
 	" KEY_NUMERIC_8 ",
 	" KEY_NUMERIC_9 "};
 
-void ledColorSet();
-
 void ledInit(void)
 {
-    softPwmCreate(Rpin, 0, 100);
-    softPwmCreate(Gpin, 0, 100);
-    softPwmCreate(Bpin, 0, 100);
-	ledColorSet(color);
+	softPwmCreate(LedPinRed,  0, 100);
+	softPwmCreate(LedPinGreen,0, 100);
+	softPwmCreate(LedPinBlue, 0, 100);
 }
 
 void ledColorSet()
 {
-	printf("%X\n", color[0]);
-    softPwmWrite(Rpin, color[0]);
-    softPwmWrite(Gpin, color[1]);
-    softPwmWrite(Bpin, color[2]);
+	softPwmWrite(LedPinRed,   color[0]);
+	softPwmWrite(LedPinGreen, color[1]);
+	softPwmWrite(LedPinBlue,  color[2]);
 }
 
 int key(char *code){
@@ -74,68 +66,50 @@ int key(char *code){
 
 int RGB(int i){
 	switch(i){
-		case 1: color[0] = Lv[0]; printf("%d\n", i); break;
-		case 2: color[0] = Lv[1]; printf("%d\n", i); break;
-		case 3: color[0] = Lv[2]; printf("%d\n", i); break;
-		case 4: color[1] = Lv[0]; printf("%d\n", i); break;
-		case 5: color[1] = Lv[1]; printf("%d\n", i); break;
-		case 6: color[1] = Lv[2]; printf("%d\n", i); break;
-		case 7: color[2] = Lv[0]; printf("%d\n", i); break;
-		case 8: color[2] = Lv[1]; printf("%d\n", i); break;
-		case 9: color[2] = Lv[2]; printf("%d\n", i); break;
+		case 1: color[0] = Lv[0]; printf("Red OFF\n"); break;
+		case 2: color[0] = Lv[1]; printf("Light Red\n"); break;
+		case 3: color[0] = Lv[2]; printf("Dark Red\n"); break;
+		case 4: color[1] = Lv[0]; printf("Green OFF\n"); break;
+		case 5: color[1] = Lv[1]; printf("Light Green\n"); break;
+		case 6: color[1] = Lv[2]; printf("Dark Green\n"); break;
+		case 7: color[2] = Lv[0]; printf("Blue OFF\n"); break;
+		case 8: color[2] = Lv[1]; printf("Light Blue\n"); break;
+		case 9: color[2] = Lv[2]; printf("Dark Green\n"); break;
 	}
 }
 
-int main()
+int main(void)
 {
+	struct lirc_config *config;
+	int buttonTimer = millis();
+	char *code;
+	char *c;
+	if(wiringPiSetup() == -1){
+		printf("setup wiringPi failed !");
+		return 1; 
+	}
+
+	if(lirc_init("lirc",1)==-1)
+		exit(EXIT_FAILURE);
+
 	ledInit();
-	RGB(1);
-	RGB(4);
-	RGB(7);
 	ledColorSet();
-}
-
-int loop(void)
-{
-    struct lirc_config *config;
- 
-    //Timer for our buttons
-    int buttonTimer = millis();
- 
-    char *code;
-    char *c;
-
-    ledInit();
-
-    if (wiringPiSetup () == -1)
-        exit (1) ;
- 
-    if(lirc_init("lirc",1)==-1)
-        exit(EXIT_FAILURE);
- 
-    //Read the default LIRC config at /etc/lirc/lircd.conf  This is the config for your remote.
-    if(lirc_readconfig(NULL,&config,NULL)==0)
-    {
-        //Do stuff while LIRC socket is open  0=open  -1=closed.
-        while(lirc_nextcode(&code)==0)
-        {
-            //If code = NULL, meaning nothing was returned from LIRC socket,
-            //then skip lines below and start while loop again.
-            if(code==NULL) continue;{
-                //Make sure there is a 400ms gap before detecting button presses.
-                if (millis() - buttonTimer  > 400){
-                    //Check to see if the string "KEY_1" appears anywhere within the string 'code'.
+	
+	if(lirc_readconfig(NULL,&config,NULL)==0)
+	{
+		while(lirc_nextcode(&code)==0)
+		{
+			if(code==NULL) continue;{
+				if (millis() - buttonTimer  > 400){
 					RGB(key(code));
 					ledColorSet(color);
-                }
-            }
-            //Need to free up code before the next loop
-            free(code);
-        }
-        //Frees the data structures associated with config.
-        lirc_freeconfig(config);
-    }
-    //lirc_deinit() closes the connection to lircd and does some internal clean-up stuff.
-    lirc_deinit();
-    exit(EXIT_SUCCESS);
+				}
+			}
+			free(code);
+		}
+		lirc_freeconfig(config);
+	}
+	lirc_deinit();
+	exit(EXIT_SUCCESS);
+	return 0;
 }
