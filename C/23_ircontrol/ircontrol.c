@@ -17,23 +17,85 @@
 #define ON 1
 #define OFF 0
 
-color[3] = {0, 0, 0};
+uchar color[3] = {0x00, 0x00, 0x00};
+uchar Lv[3]    = {0x00, 0x33, 0xE6};
+
+char *keymap[21] ={
+	" KEY_CHANNELDOWN ",
+	" KEY_CHANNEL ",
+	" KEY_CHANNELUP ",
+	" KEY_PREVIOUS ",
+	" KEY_NEXT ",
+	" KEY_PLAYPAUSE ",
+	" KEY_VOLUMEDOWN ",
+	" KEY_VOLUMEUP ",
+	" KEY_EQUAL ",
+	" KEY_NUMERIC_0 ",
+	" BTN_0 ",
+	" BTN_1 ",
+	" KEY_NUMERIC_1 ",
+	" KEY_NUMERIC_2 ",
+	" KEY_NUMERIC_3 ",
+	" KEY_NUMERIC_4 ",
+	" KEY_NUMERIC_5 ",
+	" KEY_NUMERIC_6 ",
+	" KEY_NUMERIC_7 ",
+	" KEY_NUMERIC_8 ",
+	" KEY_NUMERIC_9 "};
+
+void ledColorSet();
 
 void ledInit(void)
 {
     softPwmCreate(Rpin, 0, 100);
     softPwmCreate(Gpin, 0, 100);
     softPwmCreate(Bpin, 0, 100);
+	ledColorSet(color);
 }
 
 void ledColorSet()
 {
+	printf("%X\n", color[0]);
     softPwmWrite(Rpin, color[0]);
     softPwmWrite(Gpin, color[1]);
     softPwmWrite(Bpin, color[2]);
 }
 
-int main(int argc, char *argv[])
+int key(char *code){
+	int i;
+	int num;
+	for (i=0; i<21; i++){
+		if (strstr(code, keymap[i])){
+			num = i;
+		}
+	}
+	return num + 1;
+}
+
+int RGB(int i){
+	switch(i){
+		case 1: color[0] = Lv[0]; printf("%d\n", i); break;
+		case 2: color[0] = Lv[1]; printf("%d\n", i); break;
+		case 3: color[0] = Lv[2]; printf("%d\n", i); break;
+		case 4: color[1] = Lv[0]; printf("%d\n", i); break;
+		case 5: color[1] = Lv[1]; printf("%d\n", i); break;
+		case 6: color[1] = Lv[2]; printf("%d\n", i); break;
+		case 7: color[2] = Lv[0]; printf("%d\n", i); break;
+		case 8: color[2] = Lv[1]; printf("%d\n", i); break;
+		case 9: color[2] = Lv[2]; printf("%d\n", i); break;
+	}
+}
+
+int main()
+{
+	ledInit();
+	RGB(1);
+	RGB(4);
+	RGB(7);
+	ledColorSet();
+}
+
+int loop(void)
 {
     struct lirc_config *config;
  
@@ -48,7 +110,6 @@ int main(int argc, char *argv[])
     if (wiringPiSetup () == -1)
         exit (1) ;
  
-    //Initiate LIRC. Exit on failure
     if(lirc_init("lirc",1)==-1)
         exit(EXIT_FAILURE);
  
@@ -64,21 +125,8 @@ int main(int argc, char *argv[])
                 //Make sure there is a 400ms gap before detecting button presses.
                 if (millis() - buttonTimer  > 400){
                     //Check to see if the string "KEY_1" appears anywhere within the string 'code'.
-                    if(strstr (code,"KEY_CHANNELDOWN")){
-                        printf("MATCH on KEY_1\n");
-                        flipLED(LED1);
-                        buttonTimer = millis();
-                    }
-                    else if(strstr (code,"KEY_CHANNEL")){
-                        printf("MATCH on KEY_2\n");
-                        flipLED(LED2);
-                        buttonTimer = millis();
-                    }
-                    else if(strstr (code,"KEY_CHANNELUP")){
-                        printf("MATCH on KEY_3\n");
-                        flipLED(LED3);
-                        buttonTimer = millis();
-                    }
+					RGB(key(code));
+					ledColorSet(color);
                 }
             }
             //Need to free up code before the next loop
