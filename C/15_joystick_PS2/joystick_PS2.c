@@ -1,113 +1,55 @@
-#include <wiringPi.h>
 #include <stdio.h>
+#include <wiringPi.h>
+#include <pcf8591.h>
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#define PCF       120
+#define uchar	unsigned char
 
-#define     ADC_CS    0
-#define     ADC_CLK   1
-#define     ADC_DIO   2
-#define  JoyStick_Z   3
+int AIN0 = PCF + 0;
+int AIN1 = PCF + 1;
+int AIN2 = PCF + 2;
 
-uchar get_ADC_Result(uchar xyVal)
-{
-	//10:CH0
-	//11:CH1
-	uchar i;
-	uchar dat1=0, dat2=0;
+char *state[6] = {"home", "up", "down", "left", "right", "pressed"};
 
-	digitalWrite(ADC_CS, 0);
-
-	digitalWrite(ADC_CLK,0);
-	digitalWrite(ADC_DIO,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);
-
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2); //CH0 10
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);
-
-	if(xyVal == 'x'){
-		digitalWrite(ADC_DIO,0);	delayMicroseconds(2); //CH0 0
-	}
-	if(xyVal == 'y'){
-		digitalWrite(ADC_DIO,1);	delayMicroseconds(2); //CH1 1
-	}
-	digitalWrite(ADC_CLK,1);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
+int direction(){
+	int x, y, b;
+	int tmp;
+	x = analogRead(AIN1);
+	y = analogRead(AIN0);
+	b = analogRead(AIN2);
+	if (y == 0)
+		tmp = 1;		// up
+	if (y == 255)
+		tmp = 2;		// down
 	
-	for(i=0;i<8;i++)
-	{
-		digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
+	if (x == 255)
+		tmp = 3;		// left
+	if (x == 0)
+		tmp = 4;		// right
 
-		pinMode(ADC_DIO, INPUT);
-		dat1=dat1<<1 | digitalRead(ADC_DIO);
-	}
+	if (b == 0)
+		tmp = 5;		// button preesd
+	if (x-125<15 && x-125>-15 && y-125<15 && y-125>-15 && b == 255)
+		tmp = 0;		// home position
 	
-	for(i=0;i<8;i++)
-	{
-		dat2 = dat2 | ((uchar)(digitalRead(ADC_DIO))<<i);
-		digitalWrite(ADC_CLK,1); 	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-	}
-
-	digitalWrite(ADC_CS,1);
-
-	pinMode(ADC_DIO, OUTPUT);
-	
-	return(dat1==dat2) ? dat1 : 0;
+	return tmp;
 }
 
-int main(void)
+int main (void)
 {
-	uchar tmp;
-	uchar xVal = 0, yVal = 0, zVal = 0;
-
-	if(wiringPiSetup() == -1){
-		printf("setup wiringPi failed !");
-		return 1; 
-	}
-
-	pinMode(ADC_CS,  OUTPUT);
-	pinMode(ADC_CLK, OUTPUT);
-	pinMode(JoyStick_Z, INPUT);
-
-	pullUpDnControl(JoyStick_Z, PUD_UP);
-
-	while(1){
-		pinMode(ADC_DIO, OUTPUT);
-
-		xVal = get_ADC_Result('x');
-		if(xVal == 0)
-			tmp = 1; //up
-		if(xVal == 255)
-			tmp = 2; //down
-
-		yVal = get_ADC_Result('y');
-		if(yVal == 0)
-			tmp = 3; //left
-		if(yVal == 255)
-			tmp = 4; //right
-
-		zVal = digitalRead(JoyStick_Z);
-		if(zVal == 0)
-			tmp = 5; //button pressed
-
-		switch(tmp){
-			case 1: printf("up\n");              break;
-			case 2: printf("down\n");            break;
-			case 3: printf("right\n");           break;
-			case 4: printf("left\n");            break;
-			case 5: printf("Button Pressed!\n"); break;
-			default:
-				break;
+	int tmp;
+	int status = 0;
+	wiringPiSetup ();
+	// Setup pcf8591 on base pin 120, and address 0x48
+	pcf8591Setup (PCF, 0x48);
+	while(1) // loop forever
+	{
+		tmp = direction();
+		if (tmp != status)
+		{
+			printf("%s\n", state[tmp]);
+			status = tmp;
 		}
-
-		//delay(500);
 	}
-
-	return 0;
+	return 0 ;
 }

@@ -12,12 +12,8 @@ import PCF8591 as ADC
 import RPi.GPIO as GPIO
 import time
 
-btn = 15	# Define button pin
-
 def setup():
 	ADC.Setup(0x48)					# Setup PCF8591
-	GPIO.setmode(GPIO.BOARD)	# Numbers GPIOs by physical location
-	GPIO.setup(btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)	# Setup button pin as input an pull it up
 	global state
 	state = ['home', 'up', 'down', 'left', 'right', 'pressed', 'release']	
 
@@ -35,7 +31,7 @@ def direction():	#get joystick result
 	if ADC.read(2) == 0:
 		return 5		# Button pressed
 
-	if ADC.read(0) - 132 < 2 and ADC.read(0) - 132 > -2	and ADC.read(1) - 126 < 2 and ADC.read(1) - 126 > -2 and ADC.read(2) == 255:
+	if ADC.read(0) - 125 < 15 and ADC.read(0) - 125 > -15	and ADC.read(1) - 125 < 15 and ADC.read(1) - 125 > -15 and ADC.read(2) == 255:
 		return 0
 
 def loop():
@@ -43,9 +39,6 @@ def loop():
 	while True:
 		tmp = direction()
 		if tmp != None and tmp != status:
-#			if status == 5:
-#				print state[6]
-#			else:
 			print state[tmp]
 			status = tmp
 

@@ -1,36 +1,16 @@
 #!/usr/bin/env python
-#------------------------------------------------------
-#
-#		This is a program for Rheostat Module.
-#
-#		This program depend on ADC0832 ADC chip. Follow 
-#	the instruction book to connect the module and 
-#	ADC0832 to your Raspberry Pi.
-#
-#------------------------------------------------------
-import RPi.GPIO as GPIO
-import ADC0832
-
-def setup():
-	global tmp1			# Define initial value
-	ADC0832.setup()		# Setup ADC0832
-	tmp1 = ADC0832.getResult(0)		# Get initial value
-	print tmp1						# Print the initial calue
+import PCF8591 as ADC
 
 def loop():
 	while True:
-		global tmp1	
-		tmp2 = ADC0832.getResult(0)	# Get current value
-		if tmp2 != tmp1:			# Print the value if changed
-			print tmp2				
-			tmp1 = tmp2				# Replace the initial value
+		print ADC.read(0)
+		ADC.write(ADC.read(0))
 
-def destory():
-	GPIO.cleanup()				# Release resource
+def destroy():
+	ADC.write(0)
 
-if __name__ == '__main__':		# Program start from here
-	setup()
+if __name__ == "__main__":
 	try:
 		loop()
-	except KeyboardInterrupt:  	# When 'Ctrl+C' is pressed, the child program destroy() will be  executed.
-		destory()
+	except KeyboardInterrupt:
+		destroy()

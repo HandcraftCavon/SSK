@@ -3,6 +3,7 @@ import PCF8591 as ADC
 
 def loop():
 	while True:
+		print ADC.read(0)
 		ADC.write(ADC.read(0))
 
 def destroy():

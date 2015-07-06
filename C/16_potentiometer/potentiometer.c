@@ -1,76 +1,21 @@
-#include <wiringPi.h>
 #include <stdio.h>
+#include <wiringPi.h>
+#include <pcf8591.h>
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#define PCF       120
 
-#define     ADC_CS    0
-#define     ADC_CLK   1
-#define     ADC_DIO   2
-
-uchar get_ADC_Result(void)
+int main (void)
 {
-	uchar i;
-	uchar dat1=0, dat2=0;
-
-	digitalWrite(ADC_CS, 0);
-	digitalWrite(ADC_CLK,0);
-	digitalWrite(ADC_DIO,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,0);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	
-	for(i=0;i<8;i++)
+	int value ;
+	wiringPiSetup () ;
+	// Setup pcf8591 on base pin 120, and address 0x48
+	pcf8591Setup (PCF, 0x48) ;
+	while(1) // loop forever
 	{
-		digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-
-		pinMode(ADC_DIO, INPUT);
-		dat1=dat1<<1 | digitalRead(ADC_DIO);
+		value = analogRead  (PCF + 0) ;
+		printf("%d\n", value);
+		analogWrite (PCF + 0, value) ;
+		delay (10) ;
 	}
-	
-	for(i=0;i<8;i++)
-	{
-		dat2 = dat2 | ((uchar)(digitalRead(ADC_DIO))<<i);
-		digitalWrite(ADC_CLK,1); 	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-	}
-
-	digitalWrite(ADC_CS,1);
-	
-	return(dat1==dat2) ? dat1 : 0;
-}
-
-int main(void)
-{
-	uchar analogVal;
-	uchar tmp = 0;
-
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
-		printf("setup wiringPi failed !");
-		return 1; 
-	}
-
-	pinMode(ADC_CS,  OUTPUT);
-	pinMode(ADC_CLK, OUTPUT);
-
-	while(1){
-		pinMode(ADC_DIO, OUTPUT);
-
-		analogVal = get_ADC_Result();
-		if (analogVal != tmp){
-			printf("%d\n", analogVal);
-			tmp = analogVal;
-		}
-	}
-	return 0;
+	return 0 ;
 }
