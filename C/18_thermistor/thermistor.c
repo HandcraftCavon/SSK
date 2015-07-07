@@ -1,85 +1,74 @@
-#include <wiringPi.h>
 #include <stdio.h>
+#include <wiringPi.h>
+#include <pcf8591.h>
 #include <math.h>
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#define PCF     120
+#define DO		0
 
-#define     ADC_CS    0
-#define     ADC_CLK   1
-#define     ADC_DIO   2
-#define     TPin      3
-
-uchar get_ADC_Result(void)
+void Print(int x)
 {
-	uchar i;
-	uchar dat1=0, dat2=0;
-
-	digitalWrite(ADC_CS, 0);
-	digitalWrite(ADC_CLK,0);
-	digitalWrite(ADC_DIO,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,0);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	
-	for(i=0;i<8;i++)
+	switch(x)
 	{
-		digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-
-		pinMode(ADC_DIO, INPUT);
-		dat1=dat1<<1 | digitalRead(ADC_DIO);
+		case 0:
+			printf("\n************\n"  );
+			printf(  "* Too Hot! *\n"  );
+			printf(  "************\n\n");
+		break;
+		case 1:
+			printf("\n***********\n"  );
+			printf(  "* Better~ *\n"  );
+			printf(  "***********\n\n");
+		break;
+		default:
+			printf("\n**********************\n"  );
+			printf(  "* Print value error. *\n"  );
+			printf(  "**********************\n\n");
+		break;
 	}
-	
-	for(i=0;i<8;i++)
-	{
-		dat2 = dat2 | ((uchar)(digitalRead(ADC_DIO))<<i);
-		digitalWrite(ADC_CLK,1); 	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-	}
-
-	digitalWrite(ADC_CS,1);
-	
-	return(dat1==dat2) ? dat1 : 0;
 }
 
-int main(void)
+int main (void)
 {
-	uchar analogVal;
-	double Rt, Vr, temp;
+	unsigned char analogVal;
+	double Vr, Rt, temp;
+	int tmp, status;
 
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
+	if(wiringPiSetup() == -1){
 		printf("setup wiringPi failed !");
-		return 1; 
+		return 1;
 	}
+	// Setup pcf8591 on base pin 120, and address 0x48
+	pcf8591Setup(PCF, 0x48);
+	pinMode(DO, OUTPUT);
 
-	pinMode(ADC_CS,  OUTPUT);
-	pinMode(ADC_CLK, OUTPUT);
-	pinMode(TPin,    INPUT);
-
-	while(1){
-		pinMode(ADC_DIO, OUTPUT);
-
-		analogVal = get_ADC_Result();
+	status = 0;
+	while(1) // loop forever
+	{
+		analogVal = analogRead(PCF + 0);
 		Vr = 5 * (double)(analogVal) / 255;
 		Rt = 10000 * (double)(Vr) / (5 - (double)(Vr));
 		temp = 1 / (((log(Rt/10000)) / 3950)+(1 / (273.15 + 25)));
 		temp = temp - 273.15;
 		printf("Current temperature : %lf\n", temp);
-		if (digitalRead(TPin) == 0){
-			printf("Too Hot!\n");
-		}
-		delay(500);
-	}
+		
+		//DONOT CHOOSE BOTH. COMMENT OUT ONE OF THEM.
+		//*****************************************
+		// 1. For Analog Temperature module(with DO)
+		// tmp = digitalRead(DO);
 
-	return 0;
+        // 2. For Thermister module(with sig pin)
+         if (temp > 32) tmp = 0;
+         else tmp = 1;
+		//*****************************************
+		
+		if (tmp != status)
+		{
+			Print(tmp);
+			status = tmp;
+		}
+
+		delay (200);
+	}
+	return 0 ;
 }

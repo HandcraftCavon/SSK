@@ -1,96 +1,47 @@
-#include <wiringPi.h>
 #include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <stdlib.h>
+#include <wiringPi.h>
+#include <pcf8591.h>
 
-#define       ADC_CS     0
-#define      ADC_CLK     1
-#define      ADC_DIO     2
-#define  Hall_DO_Pin     3
+#define PCF       120
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
-
-uchar get_ADC_Result(void)
+int main (void)
 {
-	uchar i;
-	uchar dat1=0, dat2=0;
-
-	digitalWrite(ADC_CS, 0);
-	digitalWrite(ADC_CLK,0);
-	digitalWrite(ADC_DIO,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,0);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	
-	for(i=0;i<8;i++)
+	int res, tmp, status;
+	wiringPiSetup ();
+	// Setup pcf8591 on base pin 120, and address 0x48
+	pcf8591Setup (PCF, 0x48);
+	status = 0;
+	while(1) // loop forever
 	{
-		digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-
-		pinMode(ADC_DIO, INPUT);
-		dat1=dat1<<1 | digitalRead(ADC_DIO);
+		res = analogRead(PCF + 0);
+		printf("Current intensity of magnetic field : %d\n", res);
+		if (res - 133 < 5 || res - 133 > -5) 
+			tmp = 0;
+		if (res < 128) tmp = -1;
+		if (res > 138) tmp =  1;
+		if (tmp != status)
+		{
+			switch(tmp)
+			{
+				case 0:
+					printf("\n*****************\n"  );
+					printf(  "* Magnet: None. *\n"  );
+					printf(  "*****************\n\n");
+					break;
+				case -1:
+					printf("\n******************\n"  );
+					printf(  "* Magnet: North. *\n"  );
+					printf(  "******************\n\n");
+					break;
+				case 1:
+					printf("\n******************\n"  );
+					printf(  "* Magnet: South. *\n"  );
+					printf(  "******************\n\n");
+					break;
+			}
+			status = tmp;
+		}
+		delay (200);
 	}
-	
-	for(i=0;i<8;i++)
-	{
-		dat2 = dat2 | ((uchar)(digitalRead(ADC_DIO))<<i);
-		digitalWrite(ADC_CLK,1); 	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-	}
-
-	digitalWrite(ADC_CS,1);
-	
-	return(dat1==dat2) ? dat1 : 0;
+	return 0 ;
 }
-/*
-void hallISR(void)
-{
-
-}
-*/
-int main(void)
-{
-	uchar analogVal;
-	uchar digitalVal;
-	uchar mag;
-	
-	if(wiringPiSetup() < 0){
-		fprintf(stderr, "Unable to setup wiringPi:%s\n",strerror(errno));
-		return 1;
-	}
-/*
-    if(wiringPiISR(Hall_DO_Pin, INT_EDGE_RISING, &hallISR) < 0){
-		fprintf(stderr, "Unable to init ISR\n",strerror(errno));	
-		return 1;
-	}
-*/	
-	pinMode(ADC_CS,  OUTPUT);
-	pinMode(ADC_CLK, OUTPUT);
-	pinMode(Hall_DO_Pin, INPUT);
-	
-	while(1){
-		pinMode(ADC_DIO, OUTPUT);
-
-		analogVal = get_ADC_Result();
-		digitalVal = digitalRead(Hall_DO_Pin);
-		mag = 210 - analogVal;
-		printf("Current intensity of magnetic field : %d\n\n", mag);
-		if(digitalVal == 0)
-			printf("********************\n* Magnet Approach! *\n********************\n\n");
-		delay(500);
-	}
-
-	return 0;
-}
-

@@ -23,7 +23,7 @@ import time
 bus = smbus.SMBus(1)
 
 #check your PCF8591 address by type in 'sudo i2cdetect -y -1' in terminal.
-def Setup(Addr):
+def setup(Addr):
 	global address
 	address = Addr
 
@@ -46,7 +46,7 @@ def write(val):
 	bus.write_byte_data(address, 0x40, temp)
 
 if __name__ == "__main__":
-	Setup(0x48)
+	setup(0x48)
 	while True:
 		print 'AIN0 = ', read(0)
 		print 'AIN1 = ', read(1)

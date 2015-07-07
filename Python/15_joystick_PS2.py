@@ -13,7 +13,7 @@ import RPi.GPIO as GPIO
 import time
 
 def setup():
-	ADC.Setup(0x48)					# Setup PCF8591
+	ADC.setup(0x48)					# Setup PCF8591
 	global state
 	state = ['home', 'up', 'down', 'left', 'right', 'pressed', 'release']	
 

@@ -4,7 +4,7 @@ import PCF8591 as ADC
 import time
 
 def setup():
-	ADC.Setup(0x48)
+	ADC.setup(0x48)
 
 def loop():
 	status = 0

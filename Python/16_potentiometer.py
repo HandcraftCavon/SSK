@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import PCF8591 as ADC
 
+def setup():
+	ADC.setup(0x48)
+
 def loop():
 	while True:
 		print ADC.read(0)
@@ -11,6 +14,7 @@ def destroy():
 
 if __name__ == "__main__":
 	try:
+		setup()
 		loop()
 	except KeyboardInterrupt:
 		destroy()
