@@ -6,6 +6,26 @@ import time
 def setup():
 	ADC.setup(0x48)
 
+def Print(x):
+	if x == 0:
+		print ''
+		print '*************'
+		print '* No Magnet *'
+		print '*************'
+		print ''
+	if x == 1:
+		print ''
+		print '****************'
+		print '* Magnet North *'
+		print '****************'
+		print ''
+	if x == -1:
+		print ''
+		print '****************'
+		print '* Magnet South *'
+		print '****************'
+		print ''
+
 def loop():
 	status = 0
 	while True:
@@ -18,24 +38,7 @@ def loop():
 		if res > 138:
 			tmp = 1
 		if tmp != status:
-			if tmp == 0:
-				print ''
-				print '*************'
-				print '* No Magnet *'
-				print '*************'
-				print ''
-			if tmp == 1:
-				print ''
-				print '****************'
-				print '* Magnet North *'
-				print '****************'
-				print ''
-			if tmp == -1:
-				print ''
-				print '****************'
-				print '* Magnet South *'
-				print '****************'
-				print ''
+			Print(tmp)
 			status = tmp
 		time.sleep(0.2)
 

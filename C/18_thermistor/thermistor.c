@@ -3,8 +3,8 @@
 #include <pcf8591.h>
 #include <math.h>
 
-#define PCF     120
-#define DO		0
+#define		PCF     120
+#define		DOpin	0
 
 void Print(int x)
 {
@@ -28,23 +28,25 @@ void Print(int x)
 	}
 }
 
-int main (void)
+int main()
 {
 	unsigned char analogVal;
 	double Vr, Rt, temp;
 	int tmp, status;
-
+	
 	if(wiringPiSetup() == -1){
 		printf("setup wiringPi failed !");
 		return 1;
 	}
 	// Setup pcf8591 on base pin 120, and address 0x48
 	pcf8591Setup(PCF, 0x48);
-	pinMode(DO, OUTPUT);
+
+	pinMode(DOpin, INPUT);
 
 	status = 0;
 	while(1) // loop forever
 	{
+		printf("loop");
 		analogVal = analogRead(PCF + 0);
 		Vr = 5 * (double)(analogVal) / 255;
 		Rt = 10000 * (double)(Vr) / (5 - (double)(Vr));
@@ -52,16 +54,17 @@ int main (void)
 		temp = temp - 273.15;
 		printf("Current temperature : %lf\n", temp);
 		
-		//DONOT CHOOSE BOTH. COMMENT OUT ONE OF THEM.
-		//*****************************************
+		// For a threshold, uncomment one of the code for
+		// which module you use. DONOT UNCOMMENT BOTH!
+		//---------------------------------------------
 		// 1. For Analog Temperature module(with DO)
-		// tmp = digitalRead(DO);
+		tmp = digitalRead(DOpin);
 
         // 2. For Thermister module(with sig pin)
-         if (temp > 32) tmp = 0;
-         else tmp = 1;
-		//*****************************************
-		
+        // if (temp > 33) tmp = 0;
+        // else if (temp < 31) tmp = 1;
+		//---------------------------------------------
+
 		if (tmp != status)
 		{
 			Print(tmp);
@@ -70,5 +73,5 @@ int main (void)
 
 		delay (200);
 	}
-	return 0 ;
+	return 0;
 }

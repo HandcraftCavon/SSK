@@ -1,19 +1,21 @@
 #!/usr/bin/env python
-import ADC0832
+import PCF8591 as ADC
 import time
 
-def init():
-	ADC0832.setup()
+def setup():
+	ADC.setup(0x48)
 
 def loop():
 	while True:
-		res = 210 - ADC0832.getResult(0)
-		print 'Current illumination : ', res
-		time.sleep(0.2)
+		print "Current illumination: ", ADC.read(0)
+		time.sleep(0.1)
 
-if __name__ == '__main__':
-	init()
+def destroy():
+	ADC.write(0)
+
+if __name__ == "__main__":
 	try:
+		setup()
 		loop()
-	except KeyboardInterrupt: 
-		ADC0832.destroy()
+	except KeyboardInterrupt:
+		destroy()

@@ -7,18 +7,14 @@
 int main (void)
 {
 	int value;
-	int count = 0;
-	wiringPiSetup ();
+	wiringPiSetup();
 	// Setup pcf8591 on base pin 120, and address 0x48
 	pcf8591Setup (PCF, 0x48);
 	while(1) // loop forever
 	{
-		value = analogRead  (PCF + 0);
-		//printf("%d\n", value);
-		if (value < 50){
-			count++;
-			printf("Voice In!!  %d\n", count);
-		}
+		value = analogRead(PCF + 0);
+		printf("Current illumination: %d\n", value);
+		delay (100);
 	}
 	return 0;
 }

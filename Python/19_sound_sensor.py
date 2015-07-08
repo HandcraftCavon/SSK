@@ -1,20 +1,23 @@
 #!/usr/bin/env python
-import ADC0832 as ADC
-import RPi.GPIO as GPIO
+import PCF8591 as ADC
 
-b = 0
+def setup():
+	ADC.setup(0x48)
+
 def loop():
+	count = 0
 	while True:
-		a = ADC.read(0)
-		if a < 20:
-			print "Voice In!!  ", b
-			b += 1
+		tmp = ADC.read(0)
+		if tmp < 50:
+			count += 1
+			print "Voice In!!  ", count
 
 def destroy():
-	GPIO.cleanup()
+	ADC.write(0)
 
 if __name__ == "__main__":
 	try:
+		setup()
 		loop()
 	except KeyboardInterrupt:
 		destroy()
