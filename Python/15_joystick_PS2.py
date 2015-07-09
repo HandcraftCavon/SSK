@@ -9,45 +9,48 @@
 #
 #------------------------------------------------------
 import PCF8591 as ADC 
-import RPi.GPIO as GPIO
 import time
 
 def setup():
 	ADC.setup(0x48)					# Setup PCF8591
 	global state
-	state = ['home', 'up', 'down', 'left', 'right', 'pressed', 'release']	
 
 def direction():	#get joystick result
-	if ADC.read(0) == 0:
-		return 1		#up
-	if ADC.read(0) == 255:
-		return 2		#down
+	state = ['home', 'up', 'down', 'left', 'right', 'pressed']
+	i = 0
 
-	if ADC.read(1) == 255:
-		return 3		#left
-	if ADC.read(1) == 0:
-		return 4		#right
+	if ADC.read(0) <= 5:
+		i = 1		#up
+	if ADC.read(0) >= 250:
+		i = 2		#down
+
+	if ADC.read(1) >= 250:
+		i = 3		#left
+	if ADC.read(1) <= 5:
+		i = 4		#right
 
 	if ADC.read(2) == 0:
-		return 5		# Button pressed
+		i = 5		# Button pressed
 
 	if ADC.read(0) - 125 < 15 and ADC.read(0) - 125 > -15	and ADC.read(1) - 125 < 15 and ADC.read(1) - 125 > -15 and ADC.read(2) == 255:
-		return 0
+		i = 0
+	
+	return state[i]
 
 def loop():
-	status = 0
+	status = ''
 	while True:
 		tmp = direction()
 		if tmp != None and tmp != status:
-			print state[tmp]
+			print tmp
 			status = tmp
 
-def destory():
-	GPIO.cleanup()				# Release resource
+def destroy():
+	pass
 
 if __name__ == '__main__':		# Program start from here
 	setup()
 	try:
 		loop()
 	except KeyboardInterrupt:  	# When 'Ctrl+C' is pressed, the child program destroy() will be  executed.
-		destory()
+		destroy()
