@@ -6,25 +6,26 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <pcf8591.h>
 
-#define     LedRed    3
-#define     LedGreen  4
-#define     LedBlue   5
+#define     LedRed		0
+#define     LedGreen	1
+#define     LedBlue		2
 
-#define     ADC_CS    0
-#define     ADC_CLK   1
-#define     ADC_DIO   2
+#define     PCF			120
 
-#define  JoyStick_Z   6
+#define		Beep		3 
 
-#define        Beep   10 
-
-#define     BUFSIZE   128
+#define		BUFSIZE		128
 
 typedef unsigned char uchar;
 typedef unsigned int  uint;
 
 static int sys_state = 1; 
+
+static int AIN0 = PCF + 0;
+static int AIN1 = PCF + 1;
+static int AIN2 = PCF + 2;
 
 void beepInit(void)
 {
@@ -109,59 +110,7 @@ void ledCtrl(int n, int state)
 	digitalWrite(n, state);
 }
 
-uchar get_ADC_Result(uchar xyVal)
-{
-	//10:CH0
-	//11:CH1
-	uchar i;
-	uchar dat1=0, dat2=0;
-
-	digitalWrite(ADC_CS, 0);
-
-	digitalWrite(ADC_CLK,0);
-	digitalWrite(ADC_DIO,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);
-
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2); //CH0 10
-	digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);
-
-	if(xyVal == 'x'){
-		digitalWrite(ADC_DIO,0);	delayMicroseconds(2); //CH0 0
-	}
-	if(xyVal == 'y'){
-		digitalWrite(ADC_DIO,1);	delayMicroseconds(2); //CH1 1
-	}
-	digitalWrite(ADC_CLK,1);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	digitalWrite(ADC_CLK,0);	
-	digitalWrite(ADC_DIO,1);    delayMicroseconds(2);
-	
-	for(i=0;i<8;i++)
-	{
-		digitalWrite(ADC_CLK,1);	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-
-		pinMode(ADC_DIO, INPUT);
-		dat1=dat1<<1 | digitalRead(ADC_DIO);
-	}
-	
-	for(i=0;i<8;i++)
-	{
-		dat2 = dat2 | ((uchar)(digitalRead(ADC_DIO))<<i);
-		digitalWrite(ADC_CLK,1); 	delayMicroseconds(2);
-		digitalWrite(ADC_CLK,0);    delayMicroseconds(2);
-	}
-
-	digitalWrite(ADC_CS,1);
-
-	pinMode(ADC_DIO, OUTPUT);
-	
-	return(dat1==dat2) ? dat1 : 0;
-}
-
-void joyStick_z_ISR(void)
+void joystickquit(void)
 {
 	sys_state = 0;
 	printf("interrupt occur !\n");
@@ -170,27 +119,34 @@ void joyStick_z_ISR(void)
 uchar get_joyStick_state(void)
 {
 	uchar tmp = 0;
-
 	uchar xVal = 0, yVal = 0, zVal = 0;
 	
-	pinMode(ADC_DIO, OUTPUT);
-
-	xVal = get_ADC_Result('x');
-	if(xVal == 255){
+	xVal = analogRead(AIN1);
+	if(xVal >= 250){
 		tmp = 1;
 	}
-	if(xVal == 0){
+	if(xVal <= 5){
 		tmp = 2;
 	}
 
-	yVal = get_ADC_Result('y');
-	if(yVal == 255){
+	yVal = analogRead(AIN0);
+	if(yVal >= 250){
 		tmp = 4;
 	}
-	if(yVal == 0){
+	if(yVal <= 5){
 		tmp = 3;
 	}
 	
+	zVal = analogRead(AIN2);
+	if(zVal <= 5){
+		tmp = 5;
+	}
+
+	if(xVal-127<30 && xVal-127>-30 && yVal-127<30 && yVal-127>-30 && zVal>127){
+		tmp = 0;
+	}
+// Uncomment this line to see the value of joystick.
+//	printf("x = %d, y = %d, z = %d",xVal,yVal,zVal);
 	return tmp;
 }
 
@@ -206,13 +162,7 @@ int main(void)
 		return 1; 
 	}
 	
-	pullUpDnControl(JoyStick_Z, PUD_UP);
-	wiringPiISR(JoyStick_Z, INT_EDGE_FALLING, &joyStick_z_ISR);
-
-	pinMode(ADC_CS,  OUTPUT);
-	pinMode(ADC_CLK, OUTPUT);
-	pinMode(ADC_DIO, OUTPUT);
-
+	pcf8591Setup(PCF, 0x48);
 	ledInit();
 	beepInit();
 	
@@ -227,6 +177,7 @@ int main(void)
 			case 2 : ++low;  break;
 			case 3 : ++high; break;
 			case 4 : --high; break;
+			case 5 : joystickquit(); break;
 			default: break;
 		}
 		
@@ -269,10 +220,9 @@ int main(void)
 			ledCtrl(LedGreen, LOW);
 			ledCtrl(LedBlue, LOW);
 			beep_off();
-			printf("System will be off...\n");
+			printf("SyStem will be off...\n");
 			break;
 		}
 	}
-
 	return 0;
 }

@@ -36,13 +36,13 @@ def edge():
 		destroy()
 		quit()
 	if temp == 'up' and lowl < highl-1:
-		lowl += 1
-	if temp == 'down' and lowl >= -5:
-		lowl -= 1
-	if temp == 'right' and highl <= 125:
 		highl += 1
-	if temp == 'left' and lowl < highl-1:
+	if temp == 'down' and lowl >= -5:
 		highl -= 1
+	if temp == 'right' and highl <= 125:
+		lowl += 1
+	if temp == 'left' and lowl < highl-1:
+		lowl -= 1
 
 def loop():
 	while True:
