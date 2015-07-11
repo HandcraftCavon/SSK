@@ -7,7 +7,7 @@ int cnt = 0;
 
 void myISR(void)
 {
-	printf("Recevied infrared. cnt = %d\n", ++cnt);	
+	printf("Received infrared. cnt = %d\n", ++cnt);	
 }
 
 int main(void)
